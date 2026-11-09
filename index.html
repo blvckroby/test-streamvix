@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#0b0618">
+<title>StreamViX | ElfHosted - Stremio Addon</title>
+<link rel="shortcut icon" href="https://raw.githubusercontent.com/qwertyuiop8899/streamvix/refs/heads/main/public/icon.png" type="image/x-icon">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+	--bg:#0a0516;
+	--bg-2:#120a26;
+	--card:rgba(26,15,52,.62);
+	--card-solid:#160c2e;
+	--line:rgba(167,139,250,.22);
+	--line-strong:rgba(167,139,250,.55);
+	--text:#f5f0ff;
+	--muted:#a99bc9;
+	--faint:#7b6da0;
+	--violet:#8b5cf6;
+	--violet-2:#a855f7;
+	--fuchsia:#d946ef;
+	--indigo:#6366f1;
+	--cyan:#38bdf8;
+	--ok:#22e29a;
+	--warn:#fbbf24;
+	--danger:#fb5a6b;
+	--grad:linear-gradient(135deg,#7c3aed 0%,#a855f7 50%,#d946ef 100%);
+	--radius:18px;
+	--ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+	margin:0;min-height:100vh;color:var(--text);
+	font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
+	font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+	background:radial-gradient(1200px 700px at 50% -10%,#2a1252 0%,transparent 60%),var(--bg);
+	overflow-x:hidden;
+}
+a{color:#c4b5fd}
+h1,h2,h3,h4,p{margin:0}
+button{font-family:inherit}
+:focus-visible{outline:2px solid #c4b5fd;outline-offset:3px;border-radius:8px}
+
+/* ───── Aurora background ───── */
+.aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
+.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;will-change:transform}
+.aurora i:nth-child(1){width:46vmax;height:46vmax;left:-12vmax;top:-14vmax;background:#7c3aed;animation:drift1 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:38vmax;height:38vmax;right:-14vmax;top:12vh;background:#c026d3;opacity:.38;animation:drift2 26s ease-in-out infinite alternate}
+.aurora i:nth-child(3){width:34vmax;height:34vmax;left:20vw;bottom:-18vmax;background:#4f46e5;opacity:.42;animation:drift3 30s ease-in-out infinite alternate}
+.aurora::after{
+	content:"";position:absolute;inset:0;
+	background-image:linear-gradient(rgba(167,139,250,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(167,139,250,.06) 1px,transparent 1px);
+	background-size:56px 56px;
+	-webkit-mask-image:radial-gradient(ellipse at 50% 20%,#000 0%,transparent 70%);
+	mask-image:radial-gradient(ellipse at 50% 20%,#000 0%,transparent 70%);
+}
+@keyframes drift1{to{transform:translate(12vw,10vh) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-14vw,8vh) scale(1.1)}}
+@keyframes drift3{to{transform:translate(10vw,-12vh) scale(1.2)}}
+
+/* ───── Layout ───── */
+#addon{width:100%;max-width:1040px;margin:0 auto;padding:clamp(18px,4vw,48px) 16px 64px}
+
+/* ───── Hero ───── */
+.hero{text-align:center;padding:clamp(8px,3vw,28px) 0 8px}
+.logo{
+	position:relative;width:104px;height:104px;margin:0 auto 22px;border-radius:28px;padding:3px;
+	background:conic-gradient(from 0deg,#7c3aed,#d946ef,#38bdf8,#7c3aed);
+	animation:spin 8s linear infinite;
+	box-shadow:0 0 60px rgba(168,85,247,.55);
+}
+.logo>div{width:100%;height:100%;border-radius:25px;background:var(--card-solid);display:grid;place-items:center;animation:spin 8s linear infinite reverse;overflow:hidden}
+.logo img{width:78%;height:78%;object-fit:contain;display:block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.name{
+	font-family:'Space Grotesk','Inter',sans-serif;font-weight:700;letter-spacing:-.02em;
+	font-size:clamp(2rem,6.2vw,3.6rem);line-height:1.05;
+	background:linear-gradient(100deg,#fff 0%,#e9d5ff 25%,#d946ef 55%,#a78bfa 80%,#fff 100%);
+	background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+	animation:shine 7s ease-in-out infinite alternate;
+}
+@keyframes shine{to{background-position:100% 0}}
+.version-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.version{
+	font-size:.8rem;font-weight:700;letter-spacing:.06em;padding:4px 12px;border-radius:999px;
+	background:rgba(139,92,246,.16);border:1px solid var(--line);color:#d8c9ff;
+}
+.status{display:inline-flex;gap:6px;text-decoration:none}
+.status-pill{
+	display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:999px;font-size:.78rem;font-weight:700;
+	background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);color:#ddd;
+}
+.dot{width:9px;height:9px;border-radius:50%;background:#7b6da0;box-shadow:0 0 0 0 transparent;transition:background .3s,box-shadow .3s}
+.dot.ok{background:#22c55e;box-shadow:0 0 8px rgba(34,197,94,.8);animation:ping 2.4s ease-out infinite}
+.dot.ko{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.8)}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(34,197,94,.55)}80%,100%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+.description{max-width:680px;margin:18px auto 0;color:var(--muted);font-size:clamp(.95rem,2.4vw,1.1rem)}
+.gives{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.gives span{
+	padding:8px 16px;border-radius:999px;font-weight:700;font-size:.9rem;
+	background:linear-gradient(180deg,rgba(139,92,246,.22),rgba(139,92,246,.08));border:1px solid var(--line);
+	transition:transform .3s var(--ease),border-color .3s,box-shadow .3s;
+}
+.gives span:hover{transform:translateY(-3px);border-color:var(--line-strong);box-shadow:0 10px 30px -10px rgba(168,85,247,.8)}
+
+/* ───── Generic card ───── */
+.card{
+	position:relative;border-radius:var(--radius);background:var(--card);border:1px solid var(--line);
+	-webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+	box-shadow:0 30px 80px -40px rgba(0,0,0,.9),inset 0 1px 0 rgba(255,255,255,.05);
+}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ───── ElfHosted ───── */
+#elfhostedInfoSection{margin:30px 0 0;padding:20px 22px;overflow:hidden;border-color:rgba(168,85,247,.5)}
+#elfhostedInfoSection::before{
+	content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;pointer-events:none;
+	background:linear-gradient(120deg,transparent 30%,rgba(217,70,239,.9),transparent 70%);background-size:250% 100%;
+	-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;
+	animation:sweep 5s linear infinite;
+}
+@keyframes sweep{to{background-position:-250% 0}}
+.badge{
+	display:inline-block;font-size:.7rem;font-weight:800;letter-spacing:.14em;padding:4px 12px;border-radius:999px;
+	background:var(--grad);color:#fff;box-shadow:0 6px 24px -6px rgba(217,70,239,.9);
+}
+.elf-text{margin-top:12px;color:#dcd2f5;font-size:.95rem;text-align:center}
+.elf-text a{font-weight:700;text-decoration:none}
+.elf-text a.g{color:#34e8a4}.elf-text a.b{color:#7dd3fc}
+.collapse-btn{
+	display:flex;align-items:center;gap:10px;margin:14px auto 0;padding:9px 18px;border-radius:12px;cursor:pointer;
+	background:rgba(139,92,246,.16);border:1px solid var(--line);color:#d8c9ff;font-weight:600;font-size:.88rem;transition:background .25s,border-color .25s;
+}
+.collapse-btn:hover{background:rgba(139,92,246,.28);border-color:var(--line-strong)}
+.collapse-btn .toggle-icon{display:inline-block;transition:transform .35s var(--ease);font-size:.7rem}
+#privateInstanceFeatures{display:none;margin-top:14px;padding:18px;border-radius:14px;background:rgba(8,4,20,.65);border:1px solid var(--line);animation:pop .4s var(--ease)}
+@keyframes pop{from{opacity:0;transform:translateY(-8px)}}
+#privateInstanceFeatures h3{font-size:1rem;text-align:center;margin-bottom:12px}
+#privateInstanceFeatures ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+#privateInstanceFeatures li{display:flex;gap:10px;font-size:.9rem;color:#e6dcff}
+#privateInstanceFeatures li::before{content:"";flex:0 0 8px;height:8px;margin-top:.55em;border-radius:50%;background:var(--ok);box-shadow:0 0 10px var(--ok)}
+.elf-note{margin-top:14px;padding:10px;border:1px dashed var(--line-strong);border-radius:12px;text-align:center;font-size:.85rem;color:#e6dcff}
+.btn-link{
+	display:inline-block;margin-top:14px;padding:10px 20px;border-radius:12px;text-decoration:none;color:#fff;font-weight:700;font-size:.9rem;
+	background:var(--grad);box-shadow:0 10px 30px -10px rgba(168,85,247,.9);transition:transform .25s var(--ease),box-shadow .25s;
+}
+.btn-link:hover{transform:translateY(-2px);box-shadow:0 16px 36px -10px rgba(217,70,239,.95)}
+
+/* ───── Installer shells ───── */
+.installer{margin:34px 0 0;padding:clamp(18px,4vw,36px)}
+.installer>h3{
+	text-align:center;font-family:'Space Grotesk','Inter',sans-serif;font-size:clamp(1.3rem,3.6vw,1.8rem);
+	letter-spacing:-.01em;margin-bottom:6px;
+}
+.installer>.sub{text-align:center;color:var(--muted);font-size:.95rem;margin-bottom:22px}
+
+/* stepper */
+.stepper{display:flex;justify-content:center;align-items:center;gap:8px;margin:0 0 26px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--faint);letter-spacing:.04em;transition:color .3s}
+.step b{
+	width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:.78rem;
+	border:1px solid var(--line);background:rgba(139,92,246,.08);transition:all .35s var(--ease);
+}
+.step.active{color:#fff}
+.step.active b{background:var(--grad);border-color:transparent;box-shadow:0 0 20px rgba(217,70,239,.7);transform:scale(1.1)}
+.step.done{color:#c4b5fd}.step.done b{background:rgba(34,226,154,.18);border-color:var(--ok);color:var(--ok)}
+.step-sep{width:28px;height:1px;background:var(--line)}
+
+/* global option */
+.global-opt{
+	display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:22px;
+	padding:12px 16px;border-radius:14px;background:rgba(139,92,246,.09);border:1px solid var(--line);
+}
+.global-opt>span{font-size:.82rem;color:var(--muted);font-weight:600}
+.global-opt label.inline{display:inline-flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+.global-opt .t{font-weight:700;color:#d8c9ff;font-size:.9rem}
+.state-label{font-size:.75rem;font-weight:800;min-width:2.2rem;color:var(--danger);transition:color .2s}
+.state-label.on{color:var(--ok)}
+
+/* preset groups + cards */
+.preset-group{margin-bottom:20px;padding:18px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.025)}
+.preset-group.proxy{border-color:rgba(34,226,154,.3);background:rgba(34,226,154,.035)}
+.group-title{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:.78rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.preset-group.proxy .group-title{color:var(--ok)}
+.preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.preset-card{
+	--mx:50%;--my:50%;position:relative;overflow:hidden;padding:18px;border-radius:16px;cursor:pointer;
+	border:1px solid var(--line);background:linear-gradient(160deg,rgba(60,30,110,.55),rgba(26,14,52,.7));
+	transition:transform .35s var(--ease),border-color .3s,box-shadow .35s,background .3s;
+}
+.preset-card::before{
+	content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .3s;
+	background:radial-gradient(260px circle at var(--mx) var(--my),rgba(217,70,239,.28),transparent 60%);
+}
+.preset-card:hover{transform:translateY(-5px);border-color:var(--line-strong);box-shadow:0 22px 44px -22px rgba(168,85,247,.9)}
+.preset-card:hover::before{opacity:1}
+.preset-card:active{transform:translateY(-2px) scale(.99)}
+.preset-card.selected{border-color:var(--ok);background:linear-gradient(160deg,rgba(34,226,154,.2),rgba(26,14,52,.7));box-shadow:0 0 0 1px var(--ok),0 18px 40px -20px rgba(34,226,154,.7)}
+.preset-card:focus-visible{outline-offset:2px}
+.pc-title{font-weight:800;font-size:1rem;margin-bottom:6px;color:#efe7ff}
+.pc-desc{font-size:.76rem;color:var(--muted);line-height:1.5}
+
+/* preset details */
+#presetDetailsPanel{display:none;padding:clamp(16px,3vw,26px);border-radius:16px;background:rgba(8,4,20,.62);border:1px solid var(--line-strong);margin-bottom:20px;animation:pop .45s var(--ease)}
+#presetName{font-size:1.15rem;margin-bottom:12px;color:#e9ddff}
+#presetProviders{margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-block;padding:5px 12px;border-radius:999px;font-size:.8rem;font-weight:600;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.45);color:#e6dcff}
+#mfpPromptContainer{display:none;margin:16px 0;padding:18px;border-radius:14px;background:rgba(60,30,110,.4);border:1px solid var(--line)}
+.field-label{display:block;font-size:.85rem;font-weight:700;color:#d8c9ff;margin-bottom:8px}
+.field-label small{font-weight:500;color:var(--muted)}
+input[type=text],input[type=password]{
+	width:100%;padding:12px 14px;border-radius:12px;font:inherit;font-size:.95rem;color:#fff;
+	background:rgba(10,5,24,.8);border:1px solid var(--line);transition:border-color .2s,box-shadow .2s;
+}
+input[type=text]::placeholder,input[type=password]::placeholder{color:var(--faint)}
+input[type=text]:focus,input[type=password]:focus{outline:none;border-color:var(--violet-2);box-shadow:0 0 0 4px rgba(168,85,247,.22)}
+input.invalid{border-color:var(--danger)!important;box-shadow:0 0 0 4px rgba(251,90,107,.2);animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.stack>*+*{margin-top:14px}
+
+/* backend segmented control */
+.backend{text-align:center;margin-top:16px}
+.backend .lbl{font-size:.78rem;font-weight:700;color:#c4b5fd;margin-bottom:8px;letter-spacing:.05em}
+.seg{
+	position:relative;display:flex;width:min(300px,100%);height:42px;margin:0 auto;padding:3px;border-radius:999px;
+	background:rgba(10,5,24,.9);border:1px solid var(--line);box-shadow:inset 0 0 10px rgba(0,0,0,.5);user-select:none;
+}
+.seg .thumb{
+	position:absolute;top:3px;left:3px;width:calc(50% - 3px);height:calc(100% - 6px);border-radius:999px;
+	background:linear-gradient(135deg,#8b5cf6,#5b21b6);box-shadow:0 0 16px rgba(139,92,246,.7);
+	transition:transform .35s var(--ease),background .35s,box-shadow .35s;
+}
+.seg.mfp .thumb{transform:translateX(100%);background:linear-gradient(135deg,#38bdf8,#0e7490);box-shadow:0 0 16px rgba(56,189,248,.7)}
+.seg button{
+	flex:1;position:relative;z-index:1;background:transparent;border:0;cursor:pointer;color:var(--muted);
+	font-weight:700;font-size:.84rem;letter-spacing:.03em;border-radius:999px;transition:color .25s;
+}
+.seg button[aria-selected=true]{color:#fff}
+
+/* buttons */
+.btn{
+	position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:14px;
+	border:1px solid transparent;font-weight:800;font-size:.95rem;letter-spacing:.02em;color:#fff;cursor:pointer;
+	transition:transform .25s var(--ease),box-shadow .3s,filter .2s,background .3s;
+}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0) scale(.98)}
+.btn-primary{background:var(--grad);box-shadow:0 14px 34px -12px rgba(217,70,239,.95),inset 0 1px 0 rgba(255,255,255,.25)}
+.btn-primary:hover{box-shadow:0 20px 44px -12px rgba(217,70,239,1),inset 0 1px 0 rgba(255,255,255,.3)}
+.btn-ok{background:linear-gradient(135deg,#059669,#22e29a);box-shadow:0 14px 34px -14px rgba(34,226,154,.9);color:#04210f}
+.btn-blue{background:linear-gradient(135deg,#1d4ed8,#38bdf8);box-shadow:0 14px 34px -14px rgba(56,189,248,.9)}
+.btn-ghost{background:rgba(139,92,246,.14);border-color:var(--line-strong);color:#e6dcff;font-weight:700}
+.btn-ghost:hover{background:rgba(139,92,246,.28)}
+.btn-pill{border-radius:999px;padding:12px 26px}
+.btn.copied{background:linear-gradient(135deg,#065f46,#059669)!important;box-shadow:0 14px 34px -12px rgba(52,211,153,.9)!important}
+.btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.center{text-align:center}
+.switch-mode{margin-top:10px;text-align:center}
+.switch-mode p{font-size:.85rem;color:var(--muted);margin-bottom:12px}
+
+/* install panel */
+#guidedInstallPanel{text-align:center;padding:10px 0 4px;animation:pop .5s var(--ease)}
+#guidedInstallPanel h3{font-size:1.5rem;color:var(--ok);text-shadow:0 0 24px rgba(34,226,154,.6);margin-bottom:6px}
+#guidedInstallPanel .mode{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+#guidedInstallPanel .btn-row{margin-bottom:22px}
+.check{width:64px;height:64px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;font-size:30px;background:rgba(34,226,154,.14);border:2px solid var(--ok);box-shadow:0 0 40px rgba(34,226,154,.5);animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 60px rgba(34,226,154,.8)}}
+
+/* ───── Custom form ───── */
+.form-wrap{max-width:860px;margin:0 auto}
+.fgroup{margin-top:22px;padding:18px;border-radius:16px;border:1px solid var(--line);background:rgba(8,4,20,.45)}
+.fgroup>h4{
+	display:flex;align-items:center;gap:8px;margin-bottom:12px;font-size:.78rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#c4b5fd;
+}
+.fgroup>h4::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+.form-element{margin:0}
+.form-element+.form-element{margin-top:6px}
+.toggle-row{
+	display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-radius:14px;
+	border:1px solid transparent;transition:background .25s,border-color .25s,opacity .25s;
+}
+.toggle-row:hover{background:rgba(139,92,246,.09);border-color:var(--line)}
+.toggle-row.is-on{background:rgba(139,92,246,.07)}
+.toggle-title{font-weight:700;font-size:.95rem;color:#e9ddff;min-width:0}
+.toggle-title small{display:block;margin-top:2px;font-size:.72rem;font-weight:500;color:var(--muted)}
+.toggle-right{display:inline-flex;align-items:center;gap:10px;flex-shrink:0}
+.toggle-row.dimmed .toggle-title{color:var(--faint)}
+.toggle-row.dimmed .toggle-right{filter:grayscale(1);opacity:.45}
+.toggle-row.dimmed:hover{background:transparent;border-color:transparent}
+
+.switch{position:relative;display:inline-block;width:54px;height:30px;flex-shrink:0;margin:0}
+.switch input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.slider{
+	position:absolute;inset:0;border-radius:30px;background:#2c1f4a;border:1px solid rgba(167,139,250,.25);
+	transition:background .3s,box-shadow .3s,border-color .3s;
+}
+.slider::before{
+	content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#cfc3ee;
+	box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .35s var(--ease),background .3s;
+}
+.switch input:checked+.slider{background:var(--grad);border-color:transparent;box-shadow:0 0 18px rgba(217,70,239,.65)}
+.switch input:checked+.slider::before{transform:translateX(24px);background:#fff}
+.switch input:focus-visible+.slider{outline:2px solid #c4b5fd;outline-offset:3px}
+.switch input:disabled{cursor:not-allowed}
+
+.proxy-fields{margin-top:6px;display:grid;gap:14px;padding:6px 14px 4px}
+.proxy-fields .lbl{font-size:.85rem;font-weight:700;color:#d8c9ff;margin-bottom:8px}
+
+.submenu{
+	margin:6px 0 10px;padding:16px 18px;border-radius:14px;border:1px dashed rgba(167,139,250,.5);background:rgba(20,10,40,.5);animation:pop .35s var(--ease);
+}
+.submenu .st{text-align:center;font-weight:800;font-size:.9rem;color:#d8c9ff;margin-bottom:4px;letter-spacing:.03em}
+.submenu .mode-msg{text-align:center;font-size:.8rem;color:var(--muted);margin-bottom:14px}
+.opts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.opt{
+	display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:12px;cursor:pointer;font-size:.8rem;font-weight:600;
+	background:rgba(60,30,110,.35);border:1px solid rgba(167,139,250,.28);transition:border-color .2s,background .2s,transform .2s;
+}
+.opt:hover{border-color:var(--line-strong);transform:translateY(-1px)}
+.opt:has(input:checked){background:rgba(168,85,247,.28);border-color:var(--violet-2)}
+.opt input{accent-color:#a855f7;width:16px;height:16px;margin:0}
+.opt em{font-style:normal;font-size:.66rem;color:#ffb089}
+.help-chip{
+	cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:.7rem;font-weight:800;letter-spacing:.06em;padding:8px 12px;border-radius:12px;
+	border:1px solid var(--violet);background:rgba(76,29,149,.35);color:#e6dcff;
+}
+.legend{display:none;margin-top:14px;padding:12px 14px;border-radius:12px;font-size:.76rem;line-height:1.6;color:#d8c9ff;background:rgba(8,4,20,.6);border:1px solid var(--line)}
+.warn-note{margin:0 0 10px;font-size:.78rem;font-weight:500;color:var(--warn);text-align:center;line-height:1.5}
+#liveTvSubToggles{margin:6px 0 10px;padding:10px 12px;border-radius:14px;border:1px dashed rgba(167,139,250,.5);background:rgba(20,10,40,.45);animation:pop .35s var(--ease)}
+#liveTvSubToggles .st{text-align:center;font-weight:800;color:#d8c9ff;font-size:.9rem;margin:4px 0 8px}
+
+.addon-base{display:flex;justify-content:center;margin-top:20px}
+.addon-base span{
+	display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;justify-content:center;padding:7px 14px;border-radius:999px;
+	background:rgba(0,0,0,.4);border:1px solid var(--line);font-size:.72rem;font-weight:600;letter-spacing:.03em;color:#d8c9ff;
+}
+.addon-base b{color:var(--ok);font-weight:700}
+.addon-base a{text-decoration:none;color:var(--violet-2);margin-left:4px}
+.help-btn{
+	background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.3);color:#fff;padding:5px 12px;border-radius:999px;
+	font-size:.7rem;font-weight:700;letter-spacing:.06em;cursor:pointer;transition:background .2s;
+}
+.help-btn:hover{background:rgba(255,255,255,.2)}
+
+.actions-row{display:none;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin-top:30px}
+.install-link{text-decoration:none}
+.kofi-slot{margin:24px 0 0;text-align:center}
+.kofi{
+	display:inline-flex;align-items:center;gap:10px;padding:10px 22px;border-radius:14px;background:linear-gradient(135deg,#00b521,#22e29a);
+	color:#052e12;text-decoration:none;font-weight:800;font-size:.95rem;box-shadow:0 12px 30px -12px rgba(0,181,33,.8);transition:transform .25s var(--ease),box-shadow .25s;
+}
+.kofi:hover{transform:translateY(-2px) rotate(-1deg);box-shadow:0 18px 38px -12px rgba(34,226,154,.95)}
+.kofi img{height:22px;border:0}
+
+/* toast + modal */
+.fast-toast{
+	position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);width:min(92vw,360px);padding:14px 18px;border-radius:14px;z-index:60;
+	background:rgba(22,12,46,.96);border:1px solid var(--line-strong);box-shadow:0 20px 50px rgba(0,0,0,.6);
+	text-align:center;font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .3s,transform .4s var(--ease);
+}
+.fast-toast.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
+.overlay{
+	position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:16px;
+	background:rgba(5,2,12,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);animation:fade .25s;
+}
+@keyframes fade{from{opacity:0}}
+.modal{width:100%;max-width:440px;padding:30px;border-radius:20px;text-align:center;background:var(--card-solid);border:1px solid var(--line-strong);box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 80px -20px rgba(168,85,247,.6);animation:pop .4s var(--ease)}
+.modal h3{font-size:1.3rem;margin-bottom:10px}
+.modal p{color:var(--muted);font-size:.9rem;margin-bottom:22px}
+
+footer{margin-top:36px;text-align:center;font-size:.78rem;color:var(--faint)}
+
+/* ───── Responsive & motion ───── */
+@media (max-width:560px){
+	.toggle-row{padding:11px 10px}
+	.toggle-title{font-size:.88rem}
+	.btn{width:100%}
+	.btn-row>a{width:100%}
+	.btn-row>a .btn{width:100%}
+	.fgroup{padding:14px 10px}
+	.preset-group{padding:14px 12px}
+}
+@media (prefers-reduced-motion:reduce){
+	*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+	.reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+
+<body>
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+
+<div id="addon">
+
+	<!-- ═════ HERO ═════ -->
+	<header class="hero reveal">
+		<div class="logo"><div><img src="https://raw.githubusercontent.com/qwertyuiop8899/streamvix/refs/heads/main/public/icon.png" alt="StreamViX"></div></div>
+		<h1 class="name">StreamViX | ElfHosted</h1>
+		<div class="version-row">
+			<span class="version">v12.4.23</span>
+			<a href="/chapta" id="svxChaptaStatus" class="status" title="Stato whitelist uprot / clicka — clicca per gestire">
+				<span class="status-pill" title="uprot.net">U <span id="svxDotU" class="dot"></span></span>
+				<span class="status-pill" title="clicka.cc">C <span id="svxDotC" class="dot"></span></span>
+			</a>
+		</div>
+		<p class="description">StreamViX addon con StreamingCommunity, Guardaserie, Altadefinizione, AnimeUnity, AnimeSaturn, AnimeWorld, TV ed Eventi Live</p>
+		<div class="gives" aria-label="In questo addon puoi trovare">
+			<span>🎬 Movies</span><span>📺 Series</span><span>📡 Tvs</span><span>⛩️ Animes</span>
+		</div>
+	</header>
+
+	<!-- ═════ ELFHOSTED ═════ -->
+	<section id="elfhostedInfoSection" class="card reveal">
+		<div class="center"><span class="badge">NUOVO PARTNER DI HOSTING</span></div>
+		<p class="elf-text">
+			Infrastruttura di hosting donata da <a class="g" href="https://elfhosted.com/" target="_blank" rel="noopener">ElfHosted</a> ❤️ e
+			mantenuta in modo indipendente da <a class="b" href="https://hayd.uk/" target="_blank" rel="noopener">Hayduk</a>. Consulta la <a class="b" href="https://stremio-addons-guide.elfhosted.com/" target="_blank" rel="noopener">Guida agli addon Stremio di ElfHosted</a>
+			per altri addon, oppure ottieni <a class="g" href="https://store.elfhosted.com/product/streamvix/" target="_blank" rel="noopener">la tua istanza privata e isolata (con MediaflowProxy 4K)</a> (<i>sostieni direttamente il tuo sviluppatore!</i>)
+		</p>
+		<button id="togglePrivateFeatures" type="button" class="collapse-btn" aria-expanded="false" aria-controls="privateInstanceFeatures">
+			<span class="toggle-icon">▼</span><span>Mostra le funzionalità dell'istanza privata</span>
+		</button>
+		<div id="privateInstanceFeatures">
+			<h3>Informazioni sull'istanza privata ElfHosted</h3>
+			<ul>
+				<li>Istanze private con rate‑limit separati fino a 4K</li>
+				<li>Recupero link più veloce</li>
+				<li>Tutti i link sono raggiungibili a differenza di Render e Huggingface (Mediaflow)</li>
+				<li>Il 33% dei costi di hosting va allo sviluppo dell'addon</li>
+			</ul>
+			<div class="elf-note">Ospitato da ElfHosted con prova gratuita disponibile</div>
+			<div class="center"><a class="btn-link" href="https://store.elfhosted.com/product/streamvix/" target="_blank" rel="noopener">Vedi su ElfHosted</a></div>
+		</div>
+	</section>
+
+	<!-- ═════ GUIDED INSTALLATION (default) ═════ -->
+	<section id="guidedInstallerSection" class="card installer reveal">
+		<h3>⚙️ Scegli la tua Configurazione</h3>
+		<p class="sub">Tre passaggi e sei pronto: scegli un preset, imposta il proxy, installa su Stremio.</p>
+
+		<div class="stepper" id="stepper" aria-label="Passaggi">
+			<div class="step active" data-step="1"><b>1</b>Preset</div><div class="step-sep"></div>
+			<div class="step" data-step="2"><b>2</b>Dettagli</div><div class="step-sep"></div>
+			<div class="step" data-step="3"><b>3</b>Installa</div>
+		</div>
+
+		<div id="presetGrid">
+			<div class="global-opt">
+				<span>Opzioni per tutti i preset:</span>
+				<label class="inline">
+					<span class="t">🎬▶️ Trailer TMDB</span>
+					<span class="switch"><input type="checkbox" id="guidedTrailerToggle"><span class="slider"></span></span>
+					<span id="guidedTrailerLabel" class="state-label">OFF</span>
+				</label>
+			</div>
+
+			<!-- SENZA PROXY -->
+			<div class="preset-group">
+				<div class="group-title">🔓 Senza Proxy</div>
+				<div class="preset-grid">
+					<div class="preset-card" data-preset="film-serie-nomfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie</div>
+						<div class="pc-desc">GuardaHD, Guardoserie, Guardaflix</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-anime-nomfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + Anime</div>
+						<div class="pc-desc">GuardaHD, AnimeSaturn, AnimeWorld</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-tv-nomfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + TV Live</div>
+						<div class="pc-desc">GuardaHD, Guardoserie, Guardaflix, Live TV, Vavoo NO MFP</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-anime-tv-nomfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + Anime + TV Live</div>
+						<div class="pc-desc">GuardaHD, Guardoserie, Guardaflix, AnimeSaturn, AnimeWorld, Live TV, Vavoo NO MFP</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- CON PROXY -->
+			<div class="preset-group proxy">
+				<div class="group-title">☂️ Con Proxy (EasyProxy o MediaFlowProxy)</div>
+				<div class="preset-grid">
+					<div class="preset-card" data-preset="film-serie-mfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie</div>
+						<div class="pc-desc">StreamingCommunity Proxy, CB01, GuardaHD, Guardoserie, Guardaflix</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-anime-mfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + Anime</div>
+						<div class="pc-desc">StreamingCommunity Proxy, CB01, GuardaHD, Guardoserie, Guardaflix, ToonItalia, TOON, AnimeSaturn, AnimeUnity Proxy, AnimeWorld</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-tv-mfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + TV Live</div>
+						<div class="pc-desc">StreamingCommunity Proxy, CB01, GuardaHD, Guardoserie, Guardaflix, Live TV, Vavoo</div>
+					</div>
+					<div class="preset-card" data-preset="film-serie-anime-tv-mfp" tabindex="0" role="button">
+						<div class="pc-title">🎬 Film + Serie + Anime + TV Live</div>
+						<div class="pc-desc">StreamingCommunity Proxy, CB01, GuardaHD, Guardoserie, Guardaflix, ToonItalia, TOON, AnimeSaturn, AnimeUnity Proxy, AnimeWorld, Live TV, Vavoo</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Preset details -->
+		<div id="presetDetailsPanel">
+			<h4 id="presetName"></h4>
+			<div id="presetProviders"></div>
+			<div id="mfpPromptContainer">
+				<div class="stack">
+					<div>
+						<label class="field-label" for="guidedMfpUrl">📍 Proxy URL <small>(obbligatorio)</small></label>
+						<input type="text" id="guidedMfpUrl" placeholder="https://mfp.example.com" autocomplete="off">
+					</div>
+					<div>
+						<label class="field-label" for="guidedMfpPwd">Password <small>(opzionale)</small></label>
+						<input type="password" id="guidedMfpPwd" placeholder="Password (opzionale)" autocomplete="off">
+					</div>
+				</div>
+				<div class="backend">
+					<div class="lbl">Backend Proxy</div>
+					<div id="guidedBackendTrack" class="seg" role="tablist" aria-label="Proxy backend">
+						<div id="guidedBackendThumb" class="thumb"></div>
+						<button type="button" id="guidedBackendEasy" role="tab" aria-selected="true">EasyProxy</button>
+						<button type="button" id="guidedBackendMfp" role="tab" aria-selected="false">MediaFlow</button>
+					</div>
+				</div>
+			</div>
+			<div class="btn-row">
+				<button id="confirmPresetBtn" type="button" class="btn btn-ok">Continua con questo Preset →</button>
+				<button id="cancelPresetBtn" type="button" class="btn btn-ghost">Indietro</button>
+			</div>
+		</div>
+
+		<div class="switch-mode" id="guidedSwitch">
+			<p>Oppure configura manualmente con la modalità personalizzata</p>
+			<button id="switchToCustomBtn" type="button" class="btn btn-ghost btn-pill">➜ Passa a Installazione Personalizzata</button>
+		</div>
+	</section>
+
+	<!-- ═════ CUSTOM INSTALLATION (hidden) ═════ -->
+	<section id="customInstallerSection" class="card installer" style="display:none">
+		<h3>🛠️ Configurazione Personalizzata</h3>
+		<p class="sub">Attiva solo i provider che ti servono.</p>
+		<div class="center" style="margin-bottom:6px">
+			<button id="switchToGuidedBtn" type="button" class="btn btn-ghost btn-pill">⬅ Torna a Installazione Guidata</button>
+		</div>
+
+		<div class="form-wrap">
+			<form id="mainForm" onsubmit="return false">
+
+				<!-- PROXY -->
+				<div class="fgroup">
+					<h4>☂️ Proxy</h4>
+					<div id="mediaflowManualSlot">
+						<div class="form-element" data-master-mfp="1">
+							<div class="toggle-row is-on" data-toggle-row="mediaflowMaster">
+								<span class="toggle-title">EasyProxy o MediaFlowProxy ☂️</span>
+								<div class="toggle-right">
+									<label class="switch">
+										<input type="checkbox" id="mediaflowMaster" name="mediaflowMaster" data-config-key="mediaflowMaster" data-main-toggle="1" data-invert="false" checked>
+										<span class="slider"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="proxy-fields">
+						<div class="form-element">
+							<div class="lbl">☂️ Proxy URL</div>
+							<input type="text" id="mediaFlowProxyUrl" name="mediaFlowProxyUrl" class="full-width" placeholder="https://proxy.example.com" autocomplete="off">
+						</div>
+						<div class="form-element">
+							<div class="lbl">Proxy Password (opzionale)</div>
+							<input type="text" id="mediaFlowProxyPassword" name="mediaFlowProxyPassword" class="full-width" autocomplete="off">
+						</div>
+					</div>
+
+					<div id="proxyBackendSelector" class="form-element backend">
+						<div class="lbl">Backend Proxy</div>
+						<div id="proxyBackendTrack" class="seg" role="tablist" aria-label="Proxy backend">
+							<div id="proxyBackendThumb" class="thumb"></div>
+							<button type="button" id="proxyBackendEasy" role="tab" aria-selected="true">EasyProxy</button>
+							<button type="button" id="proxyBackendMfp" role="tab" aria-selected="false">MediaFlow</button>
+						</div>
+					</div>
+					<input type="checkbox" id="hidden_useMediaFlow" data-config-key="useMediaFlow" style="display:none">
+
+					<div class="form-element" style="margin-top:12px">
+						<div class="toggle-row" data-toggle-row="dvrEnabled">
+							<span class="toggle-title">DVR 📹 <small>EasyProxy only</small></span>
+							<div class="toggle-right">
+								<label class="switch">
+									<input type="checkbox" id="dvrEnabled" name="dvrEnabled" data-config-key="dvrEnabled" data-main-toggle="1" data-invert="false" checked disabled>
+									<span class="slider"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- LIVE TV -->
+				<div class="fgroup">
+					<h4>📺 Live TV</h4>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="disableLiveTv">
+							<span class="toggle-title">Live TV 📺 <small>Molti canali hanno bisogno di MFP</small></span>
+							<div class="toggle-right">
+								<label class="switch">
+									<input type="checkbox" id="disableLiveTv" name="disableLiveTv" data-config-key="disableLiveTv" data-main-toggle="1" data-invert="true" checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div id="liveTvSubToggles">
+						<p class="st">Opzioni Live TV</p>
+						<p class="warn-note">⚠️ NB. Utilizzare VLC come player esterno nel caso in cui i flussi MPD non fossero riproducibili con il player di Stremio</p>
+						<div class="form-element">
+							<div class="toggle-row" data-toggle-row="vavooNoMfpEnabled">
+								<span class="toggle-title">Vavoo NO MFP 🔓</span>
+								<div class="toggle-right">
+									<label class="switch">
+										<input type="checkbox" id="vavooNoMfpEnabled" name="vavooNoMfpEnabled" data-config-key="vavooNoMfpEnabled" data-main-toggle="1" data-invert="false">
+										<span class="slider"></span>
+									</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- FILM & SERIE -->
+				<div class="fgroup">
+					<h4>🎬 Film &amp; Serie</h4>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="disableVixsrc">
+							<span class="toggle-title">StreamingCommunity 🍿</span>
+							<div class="toggle-right">
+								<label class="switch">
+									<input type="checkbox" id="disableVixsrc" name="disableVixsrc" data-config-key="disableVixsrc" data-main-toggle="1" data-invert="true" checked>
+									<span class="slider"></span>
+								</label>
+							</div>
+						</div>
+					</div>
+					<div id="vixsrcSubMenu" class="submenu">
+						<div class="st">Modalità StreamingCommunity</div>
+						<div id="vixsrcDefaultMsg" class="mode-msg">Nessuna selezione = Proxy (consigliato)</div>
+						<div class="opts">
+							<label class="opt"><input type="checkbox" id="vixDirectToggle" data-config-key="vixDirect"><span>Direct ⚠️ <em>(solo locale)</em></span></label>
+							<label class="opt"><input type="checkbox" id="vixDirectFhdToggle" data-config-key="vixDirectFhd"><span>Synthetic FHD ⚠️ <em>(solo locale)</em></span></label>
+							<label class="opt"><input type="checkbox" id="vixProxyToggle" data-config-key="vixProxy"><span>Proxy</span></label>
+							<span id="vixLegendTrigger" class="help-chip" role="button" tabindex="0">📖 HELP</span>
+						</div>
+						<div id="vixLegendPanel" class="legend">
+							<b>Default (nessuna selezione)</b>: Proxy — consigliato, richiede Proxy.<br>
+							<b>Direct ⚠️</b>: Link diretto al master — funziona SOLO se installazione locale (token IP-bound).<br>
+							<b>Synthetic FHD ⚠️</b>: Server riscrive il manifest — funziona SOLO se installazione locale (token IP-bound).<br>
+							<b>Proxy</b>: Tutto il traffico passa dal proxy. Funziona cross-IP (richiede Proxy, consigliato).<br>
+							Direct e Synthetic FHD funzionano solo se addon e player sono sulla stessa rete.
+						</div>
+					</div>
+
+					<div class="form-element">
+						<div class="toggle-row" data-toggle-row="cb01Enabled">
+							<span class="toggle-title">CB01 🎞️ - 🔒 <small>Inserisci Proxy URL per abilitare</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="cb01Enabled" name="cb01Enabled" data-config-key="cb01Enabled" data-main-toggle="1" data-invert="false" checked disabled>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="guardahdEnabled">
+							<span class="toggle-title">GuardaHD 🎬 - 🔓</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="guardahdEnabled" name="guardahdEnabled" data-config-key="guardahdEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="adnEnabled">
+							<span class="toggle-title">ADN 🎬 - 🔓</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="adnEnabled" name="adnEnabled" data-config-key="adnEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row" data-toggle-row="vidxgoEnabled">
+							<span class="toggle-title">VidXgo 🎯 - 🔒 <small>Inserisci EasyProxy per abilitare</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="vidxgoEnabled" name="vidxgoEnabled" data-config-key="vidxgoEnabled" data-main-toggle="1" data-invert="false" checked disabled>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="guardoserieEnabled">
+							<span class="toggle-title">Guardoserie 📼 - 🔓 🔒 <small>Senza Proxy solo player esterno</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="guardoserieEnabled" name="guardoserieEnabled" data-config-key="guardoserieEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="guardaflixEnabled">
+							<span class="toggle-title">Guardaflix 📼 - 🔓 🔒 <small>Senza Proxy solo player esterno</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="guardaflixEnabled" name="guardaflixEnabled" data-config-key="guardaflixEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row" data-toggle-row="eurostreamingEnabled">
+							<span class="toggle-title">Eurostreaming ▶️ - 🔓 <small>Lento 🐌</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="eurostreamingEnabled" name="eurostreamingEnabled" data-config-key="eurostreamingEnabled" data-main-toggle="1" data-invert="false">
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+				</div>
+
+				<!-- ANIME -->
+				<div class="fgroup">
+					<h4>⛩️ Anime</h4>
+					<div class="form-element">
+						<div class="toggle-row" data-toggle-row="toonitaliaEnabled">
+							<span class="toggle-title">ToonItalia 🎨 - 🔒</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="toonitaliaEnabled" name="toonitaliaEnabled" data-config-key="toonitaliaEnabled" data-main-toggle="1" data-invert="false" checked disabled>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="toonEnabled">
+							<span class="toggle-title">TOON 🧩 - 🔓</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="toonEnabled" name="toonEnabled" data-config-key="toonEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="animesaturnEnabled">
+							<span class="toggle-title">Anime Saturn 🪐 - 🔓 🔒 <small>Alcuni flussi hanno bisogno di MFP</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="animesaturnEnabled" name="animesaturnEnabled" data-config-key="animesaturnEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="animeworldEnabled">
+							<span class="toggle-title">Anime World 🌍 - 🔓</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="animeworldEnabled" name="animeworldEnabled" data-config-key="animeworldEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="animeunityEnabled">
+							<span class="toggle-title">Anime Unity ⛩️ - 🔓 🔒 <small>Alcuni flussi hanno bisogno di MFP</small></span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="animeunityEnabled" name="animeunityEnabled" data-config-key="animeunityEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div id="animeunitySubMenu" class="submenu">
+						<div class="st">Modalità AnimeUnity</div>
+						<div id="animeunityDefaultMsg" class="mode-msg">Nessuna selezione = Proxy (consigliato)</div>
+						<div class="opts">
+							<label class="opt"><input type="checkbox" id="animeunityDirectToggle" data-config-key="animeunityDirect"><span>Direct ⚠️ <em>(solo locale)</em></span></label>
+							<label class="opt"><input type="checkbox" id="animeunityDirectFhdToggle" data-config-key="animeunityDirectFhd"><span>Synthetic FHD ⚠️ <em>(solo locale)</em></span></label>
+							<label class="opt"><input type="checkbox" id="animeunityProxyToggle" data-config-key="animeunityProxy"><span>Proxy</span></label>
+						</div>
+					</div>
+				</div>
+
+				<!-- EXTRA -->
+				<div class="fgroup">
+					<h4>✨ Extra</h4>
+					<div class="form-element">
+						<div class="toggle-row is-on" data-toggle-row="trailerEnabled">
+							<span class="toggle-title">🎬▶️ Trailer TMDB</span>
+							<div class="toggle-right"><label class="switch">
+								<input type="checkbox" id="trailerEnabled" name="trailerEnabled" data-config-key="trailerEnabled" data-main-toggle="1" data-invert="false" checked>
+								<span class="slider"></span></label></div>
+						</div>
+					</div>
+					<div class="form-element">
+						<div class="toggle-row" data-toggle-row="fastMode">
+							<span class="toggle-title">Modalità Veloce ⚡</span>
+							<div class="toggle-right">
+								<button type="button" id="fastModeHelp" class="help-btn">HELP</button>
+								<label class="switch">
+									<input type="checkbox" id="fastMode" name="fastMode" data-config-key="fastMode" data-main-toggle="1">
+									<span class="slider"></span>
+								</label>
+							</div>
+						</div>
+						<div id="fastModeToast" class="fast-toast" role="status">
+							<strong>Modalità Veloce</strong><br>
+							Priorità a StreamingCommunity (SC), poi i provider successivi se SC non presente. Se SC non ha ITA, restituisce comunque SC insieme al primo provider disponibile. Per gli anime, mostra il primo che risponde sia ITA che SUB
+						</div>
+					</div>
+				</div>
+
+				<!-- hidden mirrors used for config persistence -->
+				<input type="checkbox" id="hidden_vixDirect" data-config-key="vixDirect" style="display:none"><input type="checkbox" id="hidden_vixDirectFhd" data-config-key="vixDirectFhd" style="display:none"><input type="checkbox" id="hidden_vixProxy" data-config-key="vixProxy" style="display:none">
+				<input type="checkbox" id="hidden_animeunityDirect" data-config-key="animeunityDirect" style="display:none"><input type="checkbox" id="hidden_animeunityDirectFhd" data-config-key="animeunityDirectFhd" style="display:none"><input type="checkbox" id="hidden_animeunityProxy" data-config-key="animeunityProxy" style="display:none">
+			</form>
+
+			<div id="svxAddonBaseBadge" class="addon-base">
+				<span title="Addon Base URL risolta all'avvio">Addon Base URL per Vix FHD: <b>streamvix.hayd.uk</b><a href="https://github.com/qwertyuiop8899/StreamViX/blob/main/README.md" target="_blank" rel="noopener">📖 README</a></span>
+			</div>
+		</div>
+
+		<div class="actions-row">
+			<a id="installLink" class="install-link" href="#"><button type="button" name="Install" class="btn btn-primary">🎬 INSTALLA SU STREMIO</button></a>
+			<button type="button" id="copyManifestLink" class="btn btn-blue">📋 COPIA MANIFEST URL</button>
+		</div>
+		<div id="customKofiSlot" class="kofi-slot"></div>
+	</section>
+
+	<footer>StreamViX · Stremio addon · hosting by ElfHosted</footer>
+</div>
+
+<script>
+console.log('[SVX] Custom form logic init');
+
+/* ───── Semaforo U/C: polling leggero su /api/whitelist-status ───── */
+(function(){
+	function paint(id, ok, tip){
+		var el = document.getElementById(id);
+		if(!el) return;
+		el.classList.remove('ok','ko');
+		el.classList.add(ok ? 'ok' : 'ko');
+		if(tip && el.parentElement) el.parentElement.setAttribute('title', tip);
+	}
+	function fmtAge(ms){
+		if(ms == null) return 'mai';
+		var m = Math.round(ms/60000);
+		if(m < 60) return m + 'm fa';
+		var h = Math.floor(m/60), mr = m % 60;
+		return h + 'h' + (mr ? mr + 'm' : '') + ' fa';
+	}
+	function tip(name, o){
+		return name + ' — ' + (o.whitelisted ? 'OK' : 'KO') + ' · slot ' + (o.activeSlot||'?') +
+			' (' + (o.activeProxyHost||'?') + ') · state ' + fmtAge(o.stateAgeMs);
+	}
+	function tick(){
+		fetch('/api/whitelist-status', { cache:'no-store' }).then(function(r){return r.json();}).then(function(j){
+			if(!j || !j.uprot || !j.clicka) return;
+			paint('svxDotU', !!j.uprot.whitelisted, tip('uprot.net', j.uprot));
+			paint('svxDotC', !!j.clicka.whitelisted, tip('clicka.cc', j.clicka));
+		}).catch(function(){ /* ignore */ });
+	}
+	tick();
+	setInterval(tick, 30000);
+})();
+
+/* ───── Scroll reveal + preset spotlight ───── */
+(function(){
+	var els = document.querySelectorAll('.reveal');
+	if ('IntersectionObserver' in window) {
+		var io = new IntersectionObserver(function(entries){
+			entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+		}, { threshold: 0.08 });
+		els.forEach(function(el){ io.observe(el); });
+	} else { els.forEach(function(el){ el.classList.add('in'); }); }
+	document.querySelectorAll('.preset-card').forEach(function(c){
+		c.addEventListener('pointermove', function(e){
+			var r = c.getBoundingClientRect();
+			c.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+			c.style.setProperty('--my', (e.clientY - r.top) + 'px');
+		});
+	});
+})();
+
+var installLink = document.getElementById('installLink');
+var mainForm = document.getElementById('mainForm');
+if (installLink && mainForm) {
+	try { window.__SVX_OK = true; } catch(e) {}
+	installLink.onclick = function () { return (mainForm && typeof mainForm.reportValidity === 'function') ? mainForm.reportValidity() : true; };
+
+	var buildConfigFromForm = function() {
+		var config = {};
+		var elements = mainForm.querySelectorAll('input, select, textarea');
+		elements.forEach(function(el) {
+			var key = el.id || el.getAttribute('name') || '';
+			if (!key) return;
+			if (['personalTmdbKey'].includes(key)) return; // exclude only personal key; include mediaflowMaster in config
+			if (el.type === 'checkbox') {
+				var cfgKey = el.getAttribute('data-config-key') || key;
+				var invert = el.getAttribute('data-invert') === 'true';
+				var val = !!el.checked;
+				config[cfgKey] = invert ? !val : val;
+			} else {
+				config[key] = el.value.trim();
+			}
+		});
+		// If mediaflowMaster is disabled, ensure we don't send partial/stale MFP config
+		if (!config['mediaflowMaster']) {
+			delete config['mediaFlowProxyUrl'];
+			delete config['mediaFlowProxyPassword'];
+			delete config['useMediaFlow'];
+		}
+		return config;
+	};
+	try { window.buildConfigFromForm = buildConfigFromForm; } catch(e){}
+
+	var updateLink = function() {
+		var config = buildConfigFromForm();
+		var encodedConfig = btoa(JSON.stringify(config));
+		installLink.setAttribute('href', 'stremio://' + window.location.host + '/' + encodedConfig + '/manifest.json');
+	};
+	mainForm.onchange = updateLink;
+
+	/* toggle row ON/OFF visual state */
+	var setRowState = function(row){
+		if (!row) return;
+		var input = row.querySelector('input[type="checkbox"][data-main-toggle="1"]');
+		if (!input) return;
+		row.classList.toggle('is-on', input.checked);
+	};
+	mainForm.querySelectorAll('[data-toggle-row]').forEach(function(row){
+		setRowState(row);
+		var input = row.querySelector('input[type="checkbox"][data-main-toggle="1"]');
+		if (input) input.addEventListener('change', function(){ setRowState(row); });
+	});
+
+	/* fast mode toast */
+	var fastHelpBtn = document.getElementById('fastModeHelp');
+	var fastToast = document.getElementById('fastModeToast');
+	var fastToastTimer;
+	if (fastHelpBtn && fastToast) fastHelpBtn.addEventListener('click', function(){
+		fastToast.classList.add('show');
+		clearTimeout(fastToastTimer);
+		fastToastTimer = setTimeout(function(){ fastToast.classList.remove('show'); }, 4400);
+	});
+
+	/* ── MFP master & dependent gating ── */
+	var mfpMaster = document.getElementById('mediaflowMaster');
+	var mfpUrlInput = document.getElementById('mediaFlowProxyUrl');
+	var mfpPwdInput = document.getElementById('mediaFlowProxyPassword');
+	var mfpUrlEl = mfpUrlInput ? mfpUrlInput.closest('.form-element') : null;
+	var mfpPwdEl = mfpPwdInput ? mfpPwdInput.closest('.form-element') : null;
+	var proxyFields = mfpUrlEl ? mfpUrlEl.parentElement : null;
+
+	/* Backend selector (EasyProxy / MediaFlow) → hidden checkbox useMediaFlow */
+	try {
+		var hiddenUseMf = document.getElementById('hidden_useMediaFlow');
+		var pbTrack = document.getElementById('proxyBackendTrack');
+		var pbEasy = document.getElementById('proxyBackendEasy');
+		var pbMfp = document.getElementById('proxyBackendMfp');
+		var applyBackend = function(useMf){
+			if (pbTrack) pbTrack.classList.toggle('mfp', !!useMf);
+			if (pbEasy) pbEasy.setAttribute('aria-selected', useMf ? 'false' : 'true');
+			if (pbMfp) pbMfp.setAttribute('aria-selected', useMf ? 'true' : 'false');
+			if (hiddenUseMf) hiddenUseMf.checked = !!useMf;
+		};
+		applyBackend(!!(hiddenUseMf && hiddenUseMf.checked));
+		if (pbEasy) pbEasy.addEventListener('click', function(){ applyBackend(false); updateLink(); });
+		if (pbMfp) pbMfp.addEventListener('click', function(){ applyBackend(true); updateLink(); });
+	} catch(e) { console.warn('proxyBackendSelector init failed', e); }
+
+	/* Sub-menu helper (Direct / Synthetic FHD / Proxy) shared by StreamingCommunity and AnimeUnity */
+	function wireSubMenu(cfg){
+		try {
+			var main = document.getElementById(cfg.main);
+			var sub = document.getElementById(cfg.sub);
+			var d = document.getElementById(cfg.direct), f = document.getElementById(cfg.fhd), p = document.getElementById(cfg.proxy);
+			var hd = document.getElementById('hidden_' + cfg.key + 'Direct');
+			var hf = document.getElementById('hidden_' + cfg.key + 'DirectFhd');
+			var hp = document.getElementById('hidden_' + cfg.key + 'Proxy');
+			// Restore state from hidden config fields
+			if (d && hd) d.checked = hd.checked;
+			if (f && hf) f.checked = hf.checked;
+			if (p && hp) p.checked = hp.checked;
+			var visual = function(){
+				var info = document.getElementById(cfg.msg);
+				if (!info) return;
+				var active = [];
+				if (d && d.checked) active.push('Direct');
+				if (f && f.checked) active.push('Synthetic FHD');
+				if (p && p.checked) active.push('Proxy');
+				info.textContent = active.length ? 'Modalità: ' + active.join(', ') : 'Nessuna selezione = Proxy (consigliato)';
+			};
+			[d, f, p].forEach(function(el){
+				if (!el) return;
+				el.addEventListener('change', function(){
+					visual();
+					if (hd && d) hd.checked = d.checked;
+					if (hf && f) hf.checked = f.checked;
+					if (hp && p) hp.checked = p.checked;
+					updateLink();
+				});
+			});
+			visual();
+			var syncVis = function(){ if (main && sub) sub.style.display = main.checked ? 'block' : 'none'; };
+			if (main) main.addEventListener('change', function(){ syncVis(); updateLink(); });
+			syncVis();
+		} catch(e) { console.warn(cfg.main + ' submenu failed', e); }
+	}
+	wireSubMenu({ main:'disableVixsrc', sub:'vixsrcSubMenu', key:'vix', direct:'vixDirectToggle', fhd:'vixDirectFhdToggle', proxy:'vixProxyToggle', msg:'vixsrcDefaultMsg' });
+	wireSubMenu({ main:'animeunityEnabled', sub:'animeunitySubMenu', key:'animeunity', direct:'animeunityDirectToggle', fhd:'animeunityDirectFhdToggle', proxy:'animeunityProxyToggle', msg:'animeunityDefaultMsg' });
+
+	var legendBtn = document.getElementById('vixLegendTrigger');
+	var legendPanel = document.getElementById('vixLegendPanel');
+	if (legendBtn && legendPanel) {
+		var toggleLegend = function(){ legendPanel.style.display = legendPanel.style.display === 'block' ? 'none' : 'block'; };
+		legendBtn.addEventListener('click', toggleLegend);
+		legendBtn.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLegend(); } });
+	}
+
+	/* Providers gated by master/URL. needsUrl:true → richiede Proxy URL compilato; false → solo master */
+	var gates = [
+		{ id:'cb01Enabled',        needsUrl:true  },
+		{ id:'vidxgoEnabled',      needsUrl:true  },
+		{ id:'cinemacityEnabled',  needsUrl:false },
+		{ id:'toonitaliaEnabled',  needsUrl:true  },
+		{ id:'dvrEnabled',         needsUrl:true  }
+	].map(function(g){
+		var el = document.getElementById(g.id);
+		return { el: el, row: el ? el.closest('[data-toggle-row]') : null, needsUrl: g.needsUrl, stored: null };
+	});
+	var animeUnityEl = document.getElementById('animeunityEnabled');
+	var animeUnityRow = animeUnityEl ? animeUnityEl.closest('[data-toggle-row]') : null;
+	var vixsrcCb = document.getElementById('disableVixsrc');
+	var vixsrcRow = vixsrcCb ? vixsrcCb.closest('[data-toggle-row]') : null;
+	var toonEl = document.getElementById('toonEnabled');
+	var toonRow = toonEl ? toonEl.closest('[data-toggle-row]') : null;
+
+	function syncMfp(){
+		var on = mfpMaster ? mfpMaster.checked : false;
+		var urlFilled = mfpUrlInput && mfpUrlInput.value.trim() !== '';
+		var canEnableWithUrl = on && urlFilled;
+
+		if (proxyFields) proxyFields.style.display = on ? 'grid' : 'none';
+
+		// AnimeUnity, VixSrc e TOON sempre disponibili (nessun gating MFP)
+		if (animeUnityEl && animeUnityRow) { animeUnityRow.classList.remove('dimmed'); animeUnityEl.disabled = false; setRowState(animeUnityRow); }
+		if (vixsrcCb) { vixsrcCb.disabled = false; if (vixsrcRow) { vixsrcRow.classList.remove('dimmed'); setRowState(vixsrcRow); } }
+		if (toonEl) { toonEl.disabled = false; if (toonRow) { toonRow.classList.remove('dimmed'); setRowState(toonRow); } }
+
+		gates.forEach(function(g){
+			if (!g.el) return;
+			var canEnable = g.needsUrl ? canEnableWithUrl : on;
+			if (!on) { // Master OFF
+				if (g.stored === null) g.stored = g.el.checked;
+				g.el.checked = false;
+				g.el.disabled = true;
+				if (g.row) g.row.classList.add('dimmed');
+			} else { // Master ON
+				if (g.row) g.row.classList.remove('dimmed');
+				g.el.disabled = !canEnable;
+				if (canEnable) {
+					if (g.stored !== null) { g.el.checked = g.stored; g.stored = null; }
+				} else {
+					if (g.stored === null) g.stored = g.el.checked;
+					g.el.checked = false;
+				}
+			}
+			if (g.row) setRowState(g.row);
+		});
+
+		var backendEl = document.getElementById('proxyBackendSelector');
+		if (backendEl) backendEl.style.display = on ? 'block' : 'none';
+	}
+	if (mfpMaster) { mfpMaster.addEventListener('change', function(){ syncMfp(); updateLink(); }); }
+	if (mfpUrlInput) mfpUrlInput.addEventListener('input', function(){ syncMfp(); updateLink(); });
+	if (mfpPwdInput) mfpPwdInput.addEventListener('input', function(){ syncMfp(); updateLink(); });
+	syncMfp();
+
+	/* Live TV sub-options */
+	var liveTvToggle = document.getElementById('disableLiveTv'); // invert semantics
+	var liveSub = document.getElementById('liveTvSubToggles');
+	function syncLive(){
+		var enabled = liveTvToggle ? liveTvToggle.checked : true;
+		if (liveSub) liveSub.style.display = enabled ? 'block' : 'none';
+	}
+	if (liveTvToggle) { liveTvToggle.addEventListener('change', function(){ syncLive(); updateLink(); }); syncLive(); }
+
+	window.updateLink = updateLink;
+}
+
+/* ───── Copy manifest (custom mode) ───── */
+function copyText(text){
+	if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+	return Promise.reject(new Error('Clipboard API non disponibile'));
+}
+function flashCopied(btn, idle, done){
+	btn.textContent = done; btn.classList.add('copied');
+	setTimeout(function(){ btn.textContent = idle; btn.classList.remove('copied'); }, 1600);
+}
+var copyManifestLink = document.getElementById('copyManifestLink');
+if (copyManifestLink) {
+	copyManifestLink.onclick = function () {
+		var manifestUrl;
+		if (document.getElementById('mainForm')) {
+			var config = window.buildConfigFromForm ? window.buildConfigFromForm() : {};
+			manifestUrl = window.location.protocol + '//' + window.location.host + '/' + btoa(JSON.stringify(config)) + '/manifest.json';
+		} else {
+			manifestUrl = window.location.protocol + '//' + window.location.host + '/manifest.json';
+		}
+		copyText(manifestUrl).then(function(){
+			flashCopied(copyManifestLink, '📋 COPIA MANIFEST URL', '✅ COPIATO!');
+		}).catch(function(err){
+			console.error('Errore durante la copia: ', err);
+			alert("Impossibile copiare l'URL. Copialo manualmente: " + manifestUrl);
+		});
+		return false;
+	};
+}
+
+/* ───── Sezione ElfHosted a scomparsa ───── */
+try {
+	var features = document.getElementById('privateInstanceFeatures');
+	var toggleBtn = document.getElementById('togglePrivateFeatures');
+	var icon = toggleBtn ? toggleBtn.querySelector('.toggle-icon') : null;
+	if (features && toggleBtn) {
+		toggleBtn.addEventListener('click', function(e) {
+			e.preventDefault();
+			var isHidden = features.style.display !== 'block';
+			features.style.display = isHidden ? 'block' : 'none';
+			toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+			if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+		});
+	}
+} catch (e) { console.warn(e); }
+
+try { if (typeof window.updateLink === 'function') window.updateLink(); else if (installLink) installLink.setAttribute('href', 'stremio://' + window.location.host + '/manifest.json'); } catch (e) {}
+
+/* ───── GUIDED / CUSTOM TOGGLE LOGIC ───── */
+(function(){
+	var guidedSection = document.getElementById('guidedInstallerSection');
+	var customSection = document.getElementById('customInstallerSection');
+	var switchToCustomBtn = document.getElementById('switchToCustomBtn');
+	var switchToGuidedBtn = document.getElementById('switchToGuidedBtn');
+	var actionsRow = document.querySelector('.actions-row');
+	var stepper = document.getElementById('stepper');
+	var switchBox = document.getElementById('guidedSwitch');
+
+	function setStep(n){
+		if (!stepper) return;
+		stepper.querySelectorAll('.step').forEach(function(s){
+			var i = +s.getAttribute('data-step');
+			s.classList.toggle('active', i === n);
+			s.classList.toggle('done', i < n);
+		});
+	}
+
+	function buildKofiBtn(){
+		var a = document.createElement('a');
+		a.className = 'kofi';
+		a.href = 'https://ko-fi.com/G2G41MG3ZN';
+		a.target = '_blank';
+		a.rel = 'noopener';
+		var img = document.createElement('img');
+		img.src = 'https://storage.ko-fi.com/cdn/cup-border.png';
+		img.alt = '';
+		a.appendChild(img);
+		a.appendChild(document.createTextNode('Un Grog per noi 🍻'));
+		return a;
+	}
+
+	function showGuided(){
+		if (guidedSection) guidedSection.style.display = 'block';
+		if (customSection) customSection.style.display = 'none';
+		if (actionsRow) actionsRow.style.display = 'none';
+	}
+	function showCustom(){
+		if (guidedSection) guidedSection.style.display = 'none';
+		if (customSection) { customSection.style.display = 'block'; customSection.classList.add('reveal','in'); }
+		if (actionsRow) actionsRow.style.display = 'flex';
+		window.scrollTo({ top: customSection ? customSection.offsetTop - 20 : 0, behavior: 'smooth' });
+	}
+
+	var customKofiSlot = document.getElementById('customKofiSlot');
+	if (customKofiSlot && !customKofiSlot.hasChildNodes()) customKofiSlot.appendChild(buildKofiBtn());
+	if (switchToCustomBtn) switchToCustomBtn.addEventListener('click', showCustom);
+	if (switchToGuidedBtn) switchToGuidedBtn.addEventListener('click', showGuided);
+
+	// If URL has existing config (e.g. /<base64>/configure) → open custom mode, otherwise guided/preset mode
+	var _pp = window.location.pathname.split('/').filter(function(s){ return s.length > 0; });
+	var _hasCfg = _pp.length >= 2 && _pp[_pp.length - 1] === 'configure' && _pp[_pp.length - 2].length > 10;
+	if (_hasCfg) showCustom(); else showGuided();
+
+	/* ── PRESET DEFINITIONS ── */
+	var presets = {
+		// ── SENZA PROXY ──
+		'film-serie-nomfp': {
+			name: '🎬 Film + Serie (Senza Proxy)', mfp: false,
+			providers: ['GuardaHD', 'Guardoserie', 'Guardaflix'],
+			config: { disableVixsrc:true, cb01Enabled:false, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:true, animeunityEnabled:false, animesaturnEnabled:false, animeworldEnabled:false, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:false, vavooNoMfpEnabled:false, mediaflowMaster:false, trailerEnabled:false }
+		},
+		'film-serie-anime-nomfp': {
+			name: '🎬 Film + Serie + Anime (Senza Proxy)', mfp: false,
+			providers: ['GuardaHD', 'AnimeSaturn', 'AnimeWorld', 'TOON'],
+			config: { disableVixsrc:true, cb01Enabled:false, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:false, guardaflixEnabled:false, disableLiveTv:true, animeunityEnabled:false, animesaturnEnabled:true, animeworldEnabled:true, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:true, vavooNoMfpEnabled:false, mediaflowMaster:false, trailerEnabled:false }
+		},
+		'film-serie-tv-nomfp': {
+			name: '🎬 Film + Serie + TV Live (Senza Proxy)', mfp: false,
+			providers: ['GuardaHD', 'Guardoserie', 'Guardaflix', 'Live TV', 'Vavoo NO MFP'],
+			config: { disableVixsrc:true, cb01Enabled:false, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:false, animeunityEnabled:false, animesaturnEnabled:false, animeworldEnabled:false, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:false, vavooNoMfpEnabled:true, mediaflowMaster:false, trailerEnabled:false }
+		},
+		'film-serie-anime-tv-nomfp': {
+			name: '🎬 Film + Serie + Anime + TV Live (Senza Proxy)', mfp: false,
+			providers: ['GuardaHD', 'Guardoserie', 'Guardaflix', 'AnimeSaturn', 'AnimeWorld', 'TOON', 'Live TV', 'Vavoo NO MFP'],
+			config: { disableVixsrc:true, cb01Enabled:false, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:false, animeunityEnabled:false, animesaturnEnabled:true, animeworldEnabled:true, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:true, vavooNoMfpEnabled:true, mediaflowMaster:false, trailerEnabled:false }
+		},
+		// ── con proxy (EP o MFP) ──
+		'film-serie-mfp': {
+			name: '🎬 Film + Serie (Con Proxy)', mfp: true,
+			providers: ['StreamingCommunity Proxy', 'CB01', 'GuardaHD', 'Guardoserie', 'Guardaflix'],
+			config: { disableVixsrc:false, vixProxy:true, cb01Enabled:true, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:true, animeunityEnabled:false, animesaturnEnabled:false, animeworldEnabled:false, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:false, vavooNoMfpEnabled:false, mediaflowMaster:true, trailerEnabled:false }
+		},
+		'film-serie-anime-mfp': {
+			name: '🎬 Film + Serie + Anime (Con Proxy)', mfp: true,
+			providers: ['StreamingCommunity Proxy', 'CB01', 'GuardaHD', 'Guardoserie', 'Guardaflix', 'ToonItalia', 'TOON', 'AnimeSaturn', 'AnimeUnity Proxy', 'AnimeWorld'],
+			config: { disableVixsrc:false, vixProxy:true, cb01Enabled:true, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:true, animeunityEnabled:true, animeunityProxy:true, animesaturnEnabled:true, animeworldEnabled:true, eurostreamingEnabled:false, toonitaliaEnabled:true, toonEnabled:true, vavooNoMfpEnabled:false, mediaflowMaster:true, trailerEnabled:false }
+		},
+		'film-serie-tv-mfp': {
+			name: '🎬 Film + Serie + TV Live (Con Proxy)', mfp: true,
+			providers: ['StreamingCommunity Proxy', 'CB01', 'GuardaHD', 'Guardoserie', 'Guardaflix', 'Live TV', 'Vavoo'],
+			config: { disableVixsrc:false, vixProxy:true, cb01Enabled:true, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:false, animeunityEnabled:false, animesaturnEnabled:false, animeworldEnabled:false, eurostreamingEnabled:false, toonitaliaEnabled:false, toonEnabled:false, vavooNoMfpEnabled:false, mediaflowMaster:true, trailerEnabled:false }
+		},
+		'film-serie-anime-tv-mfp': {
+			name: '🎬 Film + Serie + Anime + TV Live (Con Proxy)', mfp: true,
+			providers: ['StreamingCommunity Proxy', 'CB01', 'GuardaHD', 'Guardoserie', 'Guardaflix', 'Live TV', 'Vavoo', 'ToonItalia', 'TOON', 'AnimeSaturn', 'AnimeUnity Proxy', 'AnimeWorld'],
+			config: { disableVixsrc:false, vixProxy:true, cb01Enabled:true, guardahdEnabled:true, guardaserieEnabled:false, guardoserieEnabled:true, guardaflixEnabled:true, disableLiveTv:false, animeunityEnabled:true, animeunityProxy:true, animesaturnEnabled:true, animeworldEnabled:true, eurostreamingEnabled:false, toonitaliaEnabled:true, toonEnabled:true, vavooNoMfpEnabled:false, mediaflowMaster:true, trailerEnabled:false }
+		}
+	};
+
+	/* Trailer toggle label */
+	var guidedTrailerToggle = document.getElementById('guidedTrailerToggle');
+	var guidedTrailerLabel = document.getElementById('guidedTrailerLabel');
+	if (guidedTrailerToggle && guidedTrailerLabel) {
+		var updateTrailerLabel = function(){
+			guidedTrailerLabel.textContent = guidedTrailerToggle.checked ? 'ON' : 'OFF';
+			guidedTrailerLabel.classList.toggle('on', guidedTrailerToggle.checked);
+		};
+		guidedTrailerToggle.addEventListener('change', updateTrailerLabel);
+		updateTrailerLabel();
+	}
+
+	var presetCards = document.querySelectorAll('.preset-card');
+	var detailsPanel = document.getElementById('presetDetailsPanel');
+	var presetNameEl = document.getElementById('presetName');
+	var presetProvidersEl = document.getElementById('presetProviders');
+	var mfpPromptContainer = document.getElementById('mfpPromptContainer');
+	var guidedMfpUrl = document.getElementById('guidedMfpUrl');
+	var guidedMfpPwd = document.getElementById('guidedMfpPwd');
+	var confirmPresetBtn = document.getElementById('confirmPresetBtn');
+	var cancelPresetBtn = document.getElementById('cancelPresetBtn');
+	var presetGrid = document.getElementById('presetGrid');
+	var selectedPresetKey = null;
+	var guidedUseMediaFlow = false;
+
+	function clearSelection(){ presetCards.forEach(function(c){ c.classList.remove('selected'); }); }
+	function showGrid(){
+		if (detailsPanel) detailsPanel.style.display = 'none';
+		if (presetGrid) presetGrid.style.display = 'block';
+		if (switchBox) switchBox.style.display = 'block';
+		selectedPresetKey = null;
+		clearSelection();
+		setStep(1);
+	}
+
+	/* Guided backend selector (EasyProxy / MediaFlow) */
+	try {
+		var gbTrack = document.getElementById('guidedBackendTrack');
+		var gbEasy = document.getElementById('guidedBackendEasy');
+		var gbMfp = document.getElementById('guidedBackendMfp');
+		var applyGuidedBackend = function(useMf){
+			guidedUseMediaFlow = !!useMf;
+			if (gbTrack) gbTrack.classList.toggle('mfp', !!useMf);
+			if (gbEasy) gbEasy.setAttribute('aria-selected', useMf ? 'false' : 'true');
+			if (gbMfp) gbMfp.setAttribute('aria-selected', useMf ? 'true' : 'false');
+		};
+		if (gbEasy) gbEasy.addEventListener('click', function(){ applyGuidedBackend(false); });
+		if (gbMfp) gbMfp.addEventListener('click', function(){ applyGuidedBackend(true); });
+	} catch(e) { console.warn('guided backend selector init failed', e); }
+
+	function selectCard(card){
+		var key = card.getAttribute('data-preset');
+		var preset = presets[key];
+		if (!preset) return;
+		selectedPresetKey = key;
+		clearSelection();
+		card.classList.add('selected');
+		if (presetNameEl) presetNameEl.textContent = preset.name;
+		if (presetProvidersEl) {
+			presetProvidersEl.textContent = '';
+			preset.providers.forEach(function(p){
+				var s = document.createElement('span'); s.className = 'chip'; s.textContent = p; presetProvidersEl.appendChild(s);
+			});
+		}
+		if (mfpPromptContainer) mfpPromptContainer.style.display = preset.mfp ? 'block' : 'none';
+		if (detailsPanel) detailsPanel.style.display = 'block';
+		if (presetGrid) presetGrid.style.display = 'none';
+		if (switchBox) switchBox.style.display = 'none';
+		setStep(2);
+	}
+	presetCards.forEach(function(card){
+		card.addEventListener('click', function(){ selectCard(card); });
+		card.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectCard(card); } });
+	});
+
+	if (cancelPresetBtn) cancelPresetBtn.addEventListener('click', showGrid);
+
+	/* Confirm preset → FastMode popup → Install */
+	if (confirmPresetBtn) confirmPresetBtn.addEventListener('click', function(){
+		var preset = presets[selectedPresetKey];
+		if (!preset) return;
+		if (preset.mfp && guidedMfpUrl) {
+			if (!guidedMfpUrl.value.trim()) {
+				guidedMfpUrl.classList.remove('invalid'); void guidedMfpUrl.offsetWidth; guidedMfpUrl.classList.add('invalid');
+				guidedMfpUrl.focus();
+				return;
+			}
+			guidedMfpUrl.classList.remove('invalid');
+		}
+		var config = JSON.parse(JSON.stringify(preset.config));
+		var trailerTog = document.getElementById('guidedTrailerToggle');
+		config.trailerEnabled = trailerTog ? trailerTog.checked : false;
+		if (preset.mfp) {
+			config.mediaFlowProxyUrl = guidedMfpUrl ? guidedMfpUrl.value.trim() : '';
+			config.mediaFlowProxyPassword = guidedMfpPwd ? guidedMfpPwd.value.trim() : '';
+			config.useMediaFlow = !!guidedUseMediaFlow;
+		}
+		showFastModePopup(config);
+	});
+	if (guidedMfpUrl) guidedMfpUrl.addEventListener('input', function(){ guidedMfpUrl.classList.remove('invalid'); });
+
+	/* ── FASTMODE POPUP ── */
+	function showFastModePopup(config){
+		var overlay = document.createElement('div');
+		overlay.id = 'fastModeOverlay';
+		overlay.className = 'overlay';
+		overlay.setAttribute('role', 'dialog');
+		overlay.setAttribute('aria-modal', 'true');
+		overlay.innerHTML = '<div class="modal">'
+			+ '<h3>⚡ Modalità Veloce?</h3>'
+			+ '<p>Priorità a StreamingCommunity, poi i provider successivi se SC non presente. Se SC non ha ITA, restituisce comunque SC insieme al primo provider disponibile. Per anime, mostra il primo che risponde (ITA + SUB).</p>'
+			+ '<div class="btn-row">'
+			+ '<button id="fastModeYes" type="button" class="btn btn-ok">Sì, attiva ⚡</button>'
+			+ '<button id="fastModeNo" type="button" class="btn btn-ghost">No, normale</button>'
+			+ '</div></div>';
+		document.body.appendChild(overlay);
+		var yes = document.getElementById('fastModeYes');
+		yes.focus();
+		function done(v){ config.fastMode = v; overlay.remove(); showInstallPanel(config); }
+		yes.addEventListener('click', function(){ done(true); });
+		document.getElementById('fastModeNo').addEventListener('click', function(){ done(false); });
+	}
+
+	/* ── INSTALL PANEL ── */
+	function showInstallPanel(config){
+		var encodedConfig = btoa(JSON.stringify(config));
+		var manifestUrl = window.location.protocol + '//' + window.location.host + '/' + encodedConfig + '/manifest.json';
+		var stremioUrl = 'stremio://' + window.location.host + '/' + encodedConfig + '/manifest.json';
+
+		if (detailsPanel) detailsPanel.style.display = 'none';
+		if (presetGrid) presetGrid.style.display = 'none';
+		if (switchBox) switchBox.style.display = 'none';
+		var existing = document.getElementById('guidedInstallPanel');
+		if (existing) existing.remove();
+
+		var panel = document.createElement('div');
+		panel.id = 'guidedInstallPanel';
+		panel.innerHTML = '<div class="check">✓</div>'
+			+ '<h3>Configurazione Pronta!</h3>'
+			+ '<p class="mode">' + (config.fastMode ? '⚡ Modalità Veloce attiva' : 'Modalità normale') + '</p>'
+			+ '<div class="btn-row">'
+			+ '<a id="guidedInstallLink" class="install-link"><button type="button" class="btn btn-primary">🎬 INSTALLA SU STREMIO</button></a>'
+			+ '<button id="guidedCopyBtn" type="button" class="btn btn-blue">📋 COPIA MANIFEST URL</button>'
+			+ '</div>'
+			+ '<div id="guidedKofiSlot" class="kofi-slot"></div>'
+			+ '<div class="center" style="margin-top:20px"><button id="guidedBackBtn" type="button" class="btn btn-ghost btn-pill">⬅ Riconfigura</button></div>';
+		guidedSection.appendChild(panel);
+		document.getElementById('guidedInstallLink').setAttribute('href', stremioUrl);
+		document.getElementById('guidedKofiSlot').appendChild(buildKofiBtn());
+		setStep(3);
+
+		var copyBtn = document.getElementById('guidedCopyBtn');
+		copyBtn.addEventListener('click', function(){
+			copyText(manifestUrl).then(function(){
+				flashCopied(copyBtn, '📋 COPIA MANIFEST URL', '✅ COPIATO!');
+			}).catch(function(){ alert('Copia manualmente: ' + manifestUrl); });
+		});
+		document.getElementById('guidedBackBtn').addEventListener('click', function(){ panel.remove(); showGrid(); });
+	}
+})();
+</script>
+</body>
+</html>
