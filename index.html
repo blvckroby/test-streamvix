@@ -37,6 +37,9 @@
 }
 *{box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+button,a,label,.preset-card,.opt,.help-chip{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.view-in{animation:viewIn .55s var(--ease) both}
+@keyframes viewIn{from{opacity:0;transform:translateY(14px) scale(.985)}}
 body{
 	margin:0;min-height:100vh;color:var(--text);
 	font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;
@@ -51,10 +54,10 @@ button{font-family:inherit}
 
 /* ───── Aurora background ───── */
 .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden;pointer-events:none}
-.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;will-change:transform}
-.aurora i:nth-child(1){width:46vmax;height:46vmax;left:-12vmax;top:-14vmax;background:#7c3aed;animation:drift1 22s ease-in-out infinite alternate}
-.aurora i:nth-child(2){width:38vmax;height:38vmax;right:-14vmax;top:12vh;background:#c026d3;opacity:.38;animation:drift2 26s ease-in-out infinite alternate}
-.aurora i:nth-child(3){width:34vmax;height:34vmax;left:20vw;bottom:-18vmax;background:#4f46e5;opacity:.42;animation:drift3 30s ease-in-out infinite alternate}
+.aurora i{position:absolute;border-radius:50%;opacity:.7;will-change:transform;transform:translateZ(0);background:radial-gradient(closest-side,var(--c),transparent)}
+.aurora i:nth-child(1){width:46vmax;height:46vmax;left:-12vmax;top:-14vmax;--c:rgba(124,58,237,.9);animation:drift1 22s ease-in-out infinite alternate}
+.aurora i:nth-child(2){width:38vmax;height:38vmax;right:-14vmax;top:12vh;--c:rgba(192,38,211,.8);opacity:.5;animation:drift2 26s ease-in-out infinite alternate}
+.aurora i:nth-child(3){width:34vmax;height:34vmax;left:20vw;bottom:-18vmax;--c:rgba(79,70,229,.85);opacity:.55;animation:drift3 30s ease-in-out infinite alternate}
 .aurora::after{
 	content:"";position:absolute;inset:0;
 	background-image:linear-gradient(rgba(167,139,250,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(167,139,250,.06) 1px,transparent 1px);
@@ -137,12 +140,15 @@ button{font-family:inherit}
 .elf-text a{font-weight:700;text-decoration:none}
 .elf-text a.g{color:#34e8a4}.elf-text a.b{color:#7dd3fc}
 .collapse-btn{
-	display:flex;align-items:center;gap:10px;margin:14px auto 0;padding:9px 18px;border-radius:12px;cursor:pointer;
+	position:relative;overflow:hidden;display:flex;align-items:center;gap:10px;margin:14px auto 0;padding:9px 18px;border-radius:12px;cursor:pointer;
 	background:rgba(139,92,246,.16);border:1px solid var(--line);color:#d8c9ff;font-weight:600;font-size:.88rem;transition:background .25s,border-color .25s;
 }
 .collapse-btn:hover{background:rgba(139,92,246,.28);border-color:var(--line-strong)}
 .collapse-btn .toggle-icon{display:inline-block;transition:transform .35s var(--ease);font-size:.7rem}
-#privateInstanceFeatures{display:none;margin-top:14px;padding:18px;border-radius:14px;background:rgba(8,4,20,.65);border:1px solid var(--line);animation:pop .4s var(--ease)}
+#privateInstanceFeatures{display:grid;grid-template-rows:0fr;opacity:0;margin-top:0;transition:grid-template-rows .55s var(--ease),opacity .4s,margin-top .55s var(--ease)}
+#privateInstanceFeatures.open{grid-template-rows:1fr;opacity:1;margin-top:14px}
+#privateInstanceFeatures>.inner{overflow:hidden;min-height:0}
+#privateInstanceFeatures>.inner>div{padding:18px;border-radius:14px;background:rgba(8,4,20,.65);border:1px solid var(--line)}
 @keyframes pop{from{opacity:0;transform:translateY(-8px)}}
 #privateInstanceFeatures h3{font-size:1rem;text-align:center;margin-bottom:12px}
 #privateInstanceFeatures ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
@@ -193,7 +199,7 @@ button{font-family:inherit}
 .preset-group.proxy .group-title{color:var(--ok)}
 .preset-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
 .preset-card{
-	--mx:50%;--my:50%;position:relative;overflow:hidden;padding:18px;border-radius:16px;cursor:pointer;
+	--mx:50%;--my:50%;position:relative;overflow:hidden;will-change:transform;padding:18px;border-radius:16px;cursor:pointer;
 	border:1px solid var(--line);background:linear-gradient(160deg,rgba(60,30,110,.55),rgba(26,14,52,.7));
 	transition:transform .35s var(--ease),border-color .3s,box-shadow .35s,background .3s;
 }
@@ -207,11 +213,15 @@ button{font-family:inherit}
 .preset-card.selected{border-color:var(--ok);background:linear-gradient(160deg,rgba(34,226,154,.2),rgba(26,14,52,.7));box-shadow:0 0 0 1px var(--ok),0 18px 40px -20px rgba(34,226,154,.7)}
 .preset-card:focus-visible{outline-offset:2px}
 .pc-title{font-weight:800;font-size:1rem;margin-bottom:6px;color:#efe7ff}
-.pc-desc{font-size:.76rem;color:var(--muted);line-height:1.5}
+.pc-desc{font-size:.76rem;color:var(--muted);line-height:1.5;padding-right:26px}
+.preset-card::after{content:"→";position:absolute;right:16px;bottom:14px;font-weight:800;color:#c4b5fd;opacity:0;transform:translateX(-8px);transition:opacity .3s,transform .35s var(--ease)}
+.preset-card:hover::after,.preset-card:focus-visible::after{opacity:1;transform:none}
+.preset-card.selected::after{content:"✓";opacity:1;transform:none;color:var(--ok)}
 
 /* preset details */
 #presetDetailsPanel{display:none;padding:clamp(16px,3vw,26px);border-radius:16px;background:rgba(8,4,20,.62);border:1px solid var(--line-strong);margin-bottom:20px;animation:pop .45s var(--ease)}
 #presetName{font-size:1.15rem;margin-bottom:12px;color:#e9ddff}
+#presetDetailsPanel>.btn-row{margin-top:22px}
 #presetProviders{margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-block;padding:5px 12px;border-radius:999px;font-size:.8rem;font-weight:600;background:rgba(139,92,246,.2);border:1px solid rgba(139,92,246,.45);color:#e6dcff}
 #mfpPromptContainer{display:none;margin:16px 0;padding:18px;border-radius:14px;background:rgba(60,30,110,.4);border:1px solid var(--line)}
@@ -248,20 +258,43 @@ input.invalid{border-color:var(--danger)!important;box-shadow:0 0 0 4px rgba(251
 
 /* buttons */
 .btn{
-	position:relative;display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:13px 26px;border-radius:14px;
-	border:1px solid transparent;font-weight:800;font-size:.95rem;letter-spacing:.02em;color:#fff;cursor:pointer;
-	transition:transform .25s var(--ease),box-shadow .3s,filter .2s,background .3s;
+	--bx:50%;--by:50%;
+	position:relative;overflow:hidden;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+	padding:14px 28px;border-radius:16px;border:1px solid rgba(255,255,255,.14);
+	font-weight:800;font-size:.95rem;letter-spacing:.02em;color:#fff;cursor:pointer;
+	transition:transform .35s var(--ease),box-shadow .35s var(--ease),filter .25s,background .3s,border-color .3s;
 }
-.btn:hover{transform:translateY(-2px)}
-.btn:active{transform:translateY(0) scale(.98)}
-.btn-primary{background:var(--grad);box-shadow:0 14px 34px -12px rgba(217,70,239,.95),inset 0 1px 0 rgba(255,255,255,.25)}
-.btn-primary:hover{box-shadow:0 20px 44px -12px rgba(217,70,239,1),inset 0 1px 0 rgba(255,255,255,.3)}
-.btn-ok{background:linear-gradient(135deg,#059669,#22e29a);box-shadow:0 14px 34px -14px rgba(34,226,154,.9);color:#04210f}
-.btn-blue{background:linear-gradient(135deg,#1d4ed8,#38bdf8);box-shadow:0 14px 34px -14px rgba(56,189,248,.9)}
-.btn-ghost{background:rgba(139,92,246,.14);border-color:var(--line-strong);color:#e6dcff;font-weight:700}
-.btn-ghost:hover{background:rgba(139,92,246,.28)}
-.btn-pill{border-radius:999px;padding:12px 26px}
-.btn.copied{background:linear-gradient(135deg,#065f46,#059669)!important;box-shadow:0 14px 34px -12px rgba(52,211,153,.9)!important}
+.btn::before{ /* gloss */
+	content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;
+	background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0) 52%);
+}
+.btn::after{ /* shine sweep + cursor glow */
+	content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:0;transition:opacity .3s;
+	background:radial-gradient(120px circle at var(--bx) var(--by),rgba(255,255,255,.35),transparent 70%);
+}
+.btn:hover{transform:translateY(-3px)}
+.btn:hover::after{opacity:1}
+.btn:active{transform:translateY(0) scale(.97);transition-duration:.12s}
+.btn .ico{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:9px;background:rgba(255,255,255,.2);font-size:.95rem;transition:transform .4s var(--ease)}
+.btn:hover .ico{transform:rotate(-8deg) scale(1.12)}
+.btn .arr{display:inline-block;transition:transform .35s var(--ease)}
+.btn:hover .arr{transform:translateX(5px)}
+.btn-primary{background:var(--grad);background-size:160% 100%;box-shadow:0 14px 34px -12px rgba(217,70,239,.95),0 0 0 0 rgba(217,70,239,.5)}
+.btn-primary:hover{background-position:100% 0;box-shadow:0 22px 46px -12px rgba(217,70,239,1),0 0 0 5px rgba(217,70,239,.18)}
+.btn-ok{background:linear-gradient(135deg,#059669,#22e29a);box-shadow:0 14px 34px -14px rgba(34,226,154,.9);color:#032a14;border-color:rgba(255,255,255,.25)}
+.btn-ok .ico{background:rgba(3,42,20,.16)}
+.btn-ok:hover{box-shadow:0 22px 44px -14px rgba(34,226,154,1),0 0 0 5px rgba(34,226,154,.18)}
+.btn-blue{background:linear-gradient(135deg,#2563eb,#38bdf8);box-shadow:0 14px 34px -14px rgba(56,189,248,.9)}
+.btn-blue:hover{box-shadow:0 22px 44px -14px rgba(56,189,248,1),0 0 0 5px rgba(56,189,248,.18)}
+.btn-ghost{background:rgba(139,92,246,.14);border-color:var(--line-strong);color:#e6dcff;font-weight:700;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.btn-ghost::before{background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 60%)}
+.btn-ghost:hover{background:rgba(139,92,246,.3);border-color:#c4b5fd;box-shadow:0 14px 30px -14px rgba(168,85,247,.9)}
+.btn-pill{border-radius:999px;padding:13px 28px}
+.btn.copied{background:linear-gradient(135deg,#065f46,#10b981)!important;box-shadow:0 14px 34px -12px rgba(52,211,153,.9)!important;animation:bump .45s var(--ease)}
+@keyframes bump{40%{transform:scale(1.06)}}
+.ripple{position:absolute;border-radius:50%;pointer-events:none;z-index:0;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .65s ease-out forwards}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+.preset-card .ripple,.opt .ripple,.collapse-btn .ripple{background:rgba(196,181,253,.3)}
 .btn-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 .center{text-align:center}
 .switch-mode{margin-top:10px;text-align:center}
@@ -305,8 +338,10 @@ input.invalid{border-color:var(--danger)!important;box-shadow:0 0 0 4px rgba(251
 }
 .slider::before{
 	content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#cfc3ee;
-	box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .35s var(--ease),background .3s;
+	box-shadow:0 2px 6px rgba(0,0,0,.4);transition:transform .45s cubic-bezier(.34,1.56,.64,1),background .3s,width .2s;
 }
+.switch:active .slider::before{width:28px}
+.switch input:checked:active+.slider::before{transform:translateX(18px)}
 .switch input:checked+.slider{background:var(--grad);border-color:transparent;box-shadow:0 0 18px rgba(217,70,239,.65)}
 .switch input:checked+.slider::before{transform:translateX(24px);background:#fff}
 .switch input:focus-visible+.slider{outline:2px solid #c4b5fd;outline-offset:3px}
@@ -323,8 +358,10 @@ input.invalid{border-color:var(--danger)!important;box-shadow:0 0 0 4px rgba(251
 .opts{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
 .opt{
 	display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:12px;cursor:pointer;font-size:.8rem;font-weight:600;
-	background:rgba(60,30,110,.35);border:1px solid rgba(167,139,250,.28);transition:border-color .2s,background .2s,transform .2s;
+	background:rgba(60,30,110,.35);border:1px solid rgba(167,139,250,.28);transition:border-color .25s,background .25s,transform .35s var(--ease),box-shadow .3s;position:relative;overflow:hidden;
 }
+.opt:active{transform:scale(.95)}
+.opt:has(input:checked){box-shadow:0 8px 22px -10px rgba(168,85,247,.9)}
 .opt:hover{border-color:var(--line-strong);transform:translateY(-1px)}
 .opt:has(input:checked){background:rgba(168,85,247,.28);border-color:var(--violet-2)}
 .opt input{accent-color:#a855f7;width:16px;height:16px;margin:0}
@@ -429,7 +466,7 @@ footer{margin-top:36px;text-align:center;font-size:.78rem;color:var(--faint)}
 		<button id="togglePrivateFeatures" type="button" class="collapse-btn" aria-expanded="false" aria-controls="privateInstanceFeatures">
 			<span class="toggle-icon">▼</span><span>Mostra le funzionalità dell'istanza privata</span>
 		</button>
-		<div id="privateInstanceFeatures">
+		<div id="privateInstanceFeatures" aria-hidden="true"><div class="inner"><div>
 			<h3>Informazioni sull'istanza privata ElfHosted</h3>
 			<ul>
 				<li>Istanze private con rate‑limit separati fino a 4K</li>
@@ -439,7 +476,7 @@ footer{margin-top:36px;text-align:center;font-size:.78rem;color:var(--faint)}
 			</ul>
 			<div class="elf-note">Ospitato da ElfHosted con prova gratuita disponibile</div>
 			<div class="center"><a class="btn-link" href="https://store.elfhosted.com/product/streamvix/" target="_blank" rel="noopener">Vedi su ElfHosted</a></div>
-		</div>
+		</div></div></div>
 	</section>
 
 	<!-- ═════ GUIDED INSTALLATION (default) ═════ -->
@@ -535,7 +572,7 @@ footer{margin-top:36px;text-align:center;font-size:.78rem;color:var(--faint)}
 				</div>
 			</div>
 			<div class="btn-row">
-				<button id="confirmPresetBtn" type="button" class="btn btn-ok">Continua con questo Preset →</button>
+				<button id="confirmPresetBtn" type="button" class="btn btn-ok">Continua con questo Preset <span class="arr">→</span></button>
 				<button id="cancelPresetBtn" type="button" class="btn btn-ghost">Indietro</button>
 			</div>
 		</div>
@@ -823,8 +860,8 @@ footer{margin-top:36px;text-align:center;font-size:.78rem;color:var(--faint)}
 		</div>
 
 		<div class="actions-row">
-			<a id="installLink" class="install-link" href="#"><button type="button" name="Install" class="btn btn-primary">🎬 INSTALLA SU STREMIO</button></a>
-			<button type="button" id="copyManifestLink" class="btn btn-blue">📋 COPIA MANIFEST URL</button>
+			<a id="installLink" class="install-link" href="#"><button type="button" name="Install" class="btn btn-primary"><span class="ico">🎬</span>INSTALLA SU STREMIO</button></a>
+			<button type="button" id="copyManifestLink" class="btn btn-blue"><span class="ico">📋</span>COPIA MANIFEST URL</button>
 		</div>
 		<div id="customKofiSlot" class="kofi-slot"></div>
 	</section>
@@ -882,6 +919,28 @@ console.log('[SVX] Custom form logic init');
 			c.style.setProperty('--my', (e.clientY - r.top) + 'px');
 		});
 	});
+})();
+
+/* ───── Ripple + glow sui pulsanti ───── */
+(function(){
+	var sel = '.btn,.preset-card,.opt,.collapse-btn';
+	document.addEventListener('pointerdown', function(e){
+		var t = e.target.closest && e.target.closest(sel);
+		if (!t || t.disabled) return;
+		var r = t.getBoundingClientRect(), d = Math.max(r.width, r.height) * 2;
+		var s = document.createElement('span');
+		s.className = 'ripple';
+		s.style.cssText = 'width:'+d+'px;height:'+d+'px;left:'+(e.clientX-r.left-d/2)+'px;top:'+(e.clientY-r.top-d/2)+'px';
+		t.appendChild(s);
+		setTimeout(function(){ s.remove(); }, 700);
+	}, { passive:true });
+	document.addEventListener('pointermove', function(e){
+		var t = e.target.closest && e.target.closest('.btn');
+		if (!t) return;
+		var r = t.getBoundingClientRect();
+		t.style.setProperty('--bx', (e.clientX - r.left) + 'px');
+		t.style.setProperty('--by', (e.clientY - r.top) + 'px');
+	}, { passive:true });
 })();
 
 var installLink = document.getElementById('installLink');
@@ -1097,8 +1156,8 @@ function copyText(text){
 	return Promise.reject(new Error('Clipboard API non disponibile'));
 }
 function flashCopied(btn, idle, done){
-	btn.textContent = done; btn.classList.add('copied');
-	setTimeout(function(){ btn.textContent = idle; btn.classList.remove('copied'); }, 1600);
+	btn.innerHTML = '<span class="ico">✅</span>COPIATO!'; btn.classList.add('copied');
+	setTimeout(function(){ btn.innerHTML = '<span class="ico">📋</span>COPIA MANIFEST URL'; btn.classList.remove('copied'); }, 1600);
 }
 var copyManifestLink = document.getElementById('copyManifestLink');
 if (copyManifestLink) {
@@ -1128,8 +1187,9 @@ try {
 	if (features && toggleBtn) {
 		toggleBtn.addEventListener('click', function(e) {
 			e.preventDefault();
-			var isHidden = features.style.display !== 'block';
-			features.style.display = isHidden ? 'block' : 'none';
+			var isHidden = !features.classList.contains('open');
+			features.classList.toggle('open', isHidden);
+			features.setAttribute('aria-hidden', isHidden ? 'false' : 'true');
 			toggleBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
 			if (icon) icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
 		});
@@ -1148,6 +1208,7 @@ try { if (typeof window.updateLink === 'function') window.updateLink(); else if 
 	var stepper = document.getElementById('stepper');
 	var switchBox = document.getElementById('guidedSwitch');
 
+	function enter(el){ if(!el) return; el.classList.remove('view-in'); void el.offsetWidth; el.classList.add('view-in'); }
 	function setStep(n){
 		if (!stepper) return;
 		stepper.querySelectorAll('.step').forEach(function(s){
@@ -1172,13 +1233,13 @@ try { if (typeof window.updateLink === 'function') window.updateLink(); else if 
 	}
 
 	function showGuided(){
-		if (guidedSection) guidedSection.style.display = 'block';
+		if (guidedSection) { guidedSection.style.display = 'block'; guidedSection.classList.add('view-in'); }
 		if (customSection) customSection.style.display = 'none';
 		if (actionsRow) actionsRow.style.display = 'none';
 	}
 	function showCustom(){
 		if (guidedSection) guidedSection.style.display = 'none';
-		if (customSection) { customSection.style.display = 'block'; customSection.classList.add('reveal','in'); }
+		if (customSection) { customSection.style.display = 'block'; customSection.classList.remove('view-in'); void customSection.offsetWidth; customSection.classList.add('view-in'); }
 		if (actionsRow) actionsRow.style.display = 'flex';
 		window.scrollTo({ top: customSection ? customSection.offsetTop - 20 : 0, behavior: 'smooth' });
 	}
@@ -1267,8 +1328,8 @@ try { if (typeof window.updateLink === 'function') window.updateLink(); else if 
 	function clearSelection(){ presetCards.forEach(function(c){ c.classList.remove('selected'); }); }
 	function showGrid(){
 		if (detailsPanel) detailsPanel.style.display = 'none';
-		if (presetGrid) presetGrid.style.display = 'block';
-		if (switchBox) switchBox.style.display = 'block';
+		if (presetGrid) { presetGrid.style.display = 'block'; enter(presetGrid); }
+		if (switchBox) { switchBox.style.display = 'block'; enter(switchBox); }
 		selectedPresetKey = null;
 		clearSelection();
 		setStep(1);
@@ -1304,7 +1365,7 @@ try { if (typeof window.updateLink === 'function') window.updateLink(); else if 
 			});
 		}
 		if (mfpPromptContainer) mfpPromptContainer.style.display = preset.mfp ? 'block' : 'none';
-		if (detailsPanel) detailsPanel.style.display = 'block';
+		if (detailsPanel) { detailsPanel.style.display = 'block'; enter(detailsPanel); }
 		if (presetGrid) presetGrid.style.display = 'none';
 		if (switchBox) switchBox.style.display = 'none';
 		setStep(2);
@@ -1380,8 +1441,8 @@ try { if (typeof window.updateLink === 'function') window.updateLink(); else if 
 			+ '<h3>Configurazione Pronta!</h3>'
 			+ '<p class="mode">' + (config.fastMode ? '⚡ Modalità Veloce attiva' : 'Modalità normale') + '</p>'
 			+ '<div class="btn-row">'
-			+ '<a id="guidedInstallLink" class="install-link"><button type="button" class="btn btn-primary">🎬 INSTALLA SU STREMIO</button></a>'
-			+ '<button id="guidedCopyBtn" type="button" class="btn btn-blue">📋 COPIA MANIFEST URL</button>'
+			+ '<a id="guidedInstallLink" class="install-link"><button type="button" class="btn btn-primary"><span class="ico">🎬</span>INSTALLA SU STREMIO</button></a>'
+			+ '<button id="guidedCopyBtn" type="button" class="btn btn-blue"><span class="ico">📋</span>COPIA MANIFEST URL</button>'
 			+ '</div>'
 			+ '<div id="guidedKofiSlot" class="kofi-slot"></div>'
 			+ '<div class="center" style="margin-top:20px"><button id="guidedBackBtn" type="button" class="btn btn-ghost btn-pill">⬅ Riconfigura</button></div>';
